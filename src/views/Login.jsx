@@ -1,5 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
+import { toastError, toastSuccess } from "../utils/toast";
 
 const API_BASE = import.meta.env.VITE_API_BASE;
 const API_PATH = import.meta.env.VITE_API_PATH;
@@ -24,10 +25,12 @@ function Login({ setIsAuth, getProducts }) {
       document.cookie = `hexToken=${token};expires=${new Date(expired)}`;
 
       axios.defaults.headers.common["Authorization"] = token;
+      toastSuccess("登入成功");
       setIsAuth(true);
       getProducts();
     } catch (error) {
       setIsAuth(false);
+      toastError(`登入失敗`);
       console.log(error.response.data.message);
     }
   };

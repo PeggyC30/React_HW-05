@@ -105,10 +105,10 @@ function App() {
             <thead>
               <tr>
                 <th scope="col">分類</th>
-
                 <th scope="col">產品名稱</th>
                 <th scope="col">原價</th>
                 <th scope="col">售價</th>
+                <th scope="col">團購價</th>
                 <th scope="col">是否啟用</th>
                 <th scope="col">編輯</th>
               </tr>
@@ -117,10 +117,11 @@ function App() {
               {products.map((product) => (
                 <tr key={product.id}>
                   <th scope="row">{product.category}</th>
-
                   <th scope="row">{product.title}</th>
                   <td>{product.origin_price}</td>
                   <td>{product.price}</td>
+                  <td>{product.group_price}</td>
+
                   <td className={product.is_enabled ? "text-success" : ""}>{product.is_enabled ? "啟用" : "未啟用"}</td>
                   <td>
                     <div className="btn-group" role="group" aria-label="Basic example">
@@ -157,6 +158,7 @@ function App() {
         modalType={modalType}
         templateData={templateData}
         closeModal={closeModal}
+        pagination={pagination}
       />
     </>
   );

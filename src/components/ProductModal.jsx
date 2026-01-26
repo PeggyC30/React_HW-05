@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { toastError, toastSuccess } from "../utils/toast";
+import Pagination from "./Pagination";
 
 const API_BASE = import.meta.env.VITE_API_BASE;
 const API_PATH = import.meta.env.VITE_API_PATH;
 
-function ProductModal({ getProducts, modalType, templateData, closeModal }) {
+function ProductModal({ getProducts, pagination, modalType, templateData, closeModal }) {
   const [tempProduct, setTempProduct] = useState(templateData);
   useEffect(() => {
     setTempProduct(templateData);
@@ -46,7 +48,20 @@ function ProductModal({ getProducts, modalType, templateData, closeModal }) {
       return { ...pre, imagesUrl: newImages };
     });
   };
+
+  const validateProduct = () => {
+    if (!tempProduct.title?.trim()) return "請輸入產品標題";
+    if (tempProduct.price === "" || tempProduct.price === null) return "請輸入售價";
+
+    return null;
+  };
+
   const updataProduct = async (id) => {
+    const errorMsg = validateProduct();
+    if (errorMsg) {
+      toastError(errorMsg);
+      return; // ❌ 中斷送出
+    }
     let url = `${API_BASE}/api/${API_PATH}/admin/product`;
     let method = "post";
 
@@ -67,21 +82,24 @@ function ProductModal({ getProducts, modalType, templateData, closeModal }) {
 
     try {
       const res = await axios[method](url, productData);
-
-      getProducts();
+      toastSuccess("商品更新成功");
+      getProducts(pagination.current_page);
       closeModal();
     } catch (error) {
       console.log(error.response);
+      toastError(`商品更新失敗,${error.response.data.message}`);
     }
   };
 
   const delProduct = async (id) => {
     try {
       const res = await axios.delete(`${API_BASE}/api/${API_PATH}/admin/product/${id}`);
+      toastSuccess("商品刪除成功");
       closeModal();
       getProducts();
     } catch (error) {
       console.log(error.response);
+      toastError(`商品刪除失敗,${error.response.data.message}`);
     }
   };
 
@@ -186,7 +204,7 @@ function ProductModal({ getProducts, modalType, templateData, closeModal }) {
                 <div className="col-sm-8">
                   <div className="mb-3">
                     <label htmlFor="title" className="form-label">
-                      標題
+                      標題<small className="text-danger ms-1">*必填</small>
                     </label>
                     <input
                       name="title"
@@ -257,7 +275,7 @@ function ProductModal({ getProducts, modalType, templateData, closeModal }) {
                     </div>
                     <div className="mb-3 col-md-4">
                       <label htmlFor="price" className="form-label">
-                        售價
+                        售價<small className="text-danger ms-1">*必填</small>
                       </label>
                       <input
                         name="price"

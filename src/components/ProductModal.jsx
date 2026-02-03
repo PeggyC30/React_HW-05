@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import { toastError, toastSuccess } from "../utils/toast";
 import Pagination from "./Pagination";
@@ -8,6 +8,7 @@ const API_PATH = import.meta.env.VITE_API_PATH;
 
 function ProductModal({ getProducts, pagination, modalType, templateData, closeModal }) {
   const [tempProduct, setTempProduct] = useState(templateData);
+  const fileUploadInputRef = useRef(null);
   useEffect(() => {
     setTempProduct(templateData);
   }, [templateData]);
@@ -75,6 +76,7 @@ function ProductModal({ getProducts, pagination, modalType, templateData, closeM
         ...tempProduct,
         origin_price: Number(tempProduct.origin_price),
         price: Number(tempProduct.price),
+        group_priceprice: Number(tempProduct.group_priceprice),
         is_enabled: tempProduct.is_enabled ? 1 : 0,
         imagesUrl: [...tempProduct.imagesUrl.filter((url) => url !== "")],
       },
@@ -110,6 +112,7 @@ function ProductModal({ getProducts, pagination, modalType, templateData, closeM
       formData.append("file-to-upload", file);
       const res = await axios.post(`${API_BASE}/api/${API_PATH}/admin/upload`, formData);
       setTempProduct((pre) => ({ ...pre, imageUrl: res.data.imageUrl }));
+      fileUploadInputRef.current.value = "";
     } catch (error) {
       console.log(error.response);
     }
@@ -136,14 +139,15 @@ function ProductModal({ getProducts, pagination, modalType, templateData, closeM
                     <div className="mb-3">
                       {" "}
                       <label htmlFor="fileUpload" className="form-label">
-                        上傳圖片
+                        上傳/更換主圖片
                       </label>
                       <input
                         className="form-control"
                         type="file"
                         name="file-to-upload"
                         id="fileUpload"
-                        accept=".jpg,.jepg,.png"
+                        accept=".jpg,.jpeg,.png"
+                        ref={fileUploadInputRef}
                         onChange={(e) => {
                           uploadImage(e);
                         }}

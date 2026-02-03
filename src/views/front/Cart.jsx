@@ -84,33 +84,47 @@ function Cart() {
                   刪除
                 </button>
               </td>
-              <th scope="row">{cartItem.product.title}</th>
+              <td scope="row">{cartItem.product.title}</td>
 
               <td>
                 <div className="input-group input-group-sm mb-3">
                   <input
+                    style={{ maxWidth: "60px" }}
                     type="number"
                     min={0}
-                    className="form-control"
+                    className="form-control text-center"
                     aria-label="Sizing example input"
                     aria-describedby="inputGroup-sizing-sm"
                     defaultValue={cartItem.qty}
-                    onChange={(e) => {
+                    onKeyDown={(e) => {
+                      console.log(e);
+                      if (e.key === "Enter") {
+                        const qty = Number(e.target.value);
+
+                        if (qty <= 0) {
+                          delCart(cartItem.id, cartItem.product.title);
+                        } else {
+                          updateCart(cartItem.id, cartItem.product_id, qty);
+                        }
+                      }
+                    }}
+                    onBlur={(e) => {
                       const qty = Number(e.target.value);
 
-                      if (qty <= 0) {
+                      if (qty == 0) {
                         delCart(cartItem.id, cartItem.product.title);
                       } else {
                         updateCart(cartItem.id, cartItem.product_id, qty);
                       }
                     }}
                   />
+
                   <span className="input-group-text" id="inputGroup-sizing-sm">
                     {cartItem.product.unit}
                   </span>
                 </div>
               </td>
-              <td className="text-end">{currency(cartItem.final_total)}</td>
+              <td>{currency(cartItem.final_total)}</td>
             </tr>
           ))}
         </tbody>

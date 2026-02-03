@@ -33,7 +33,7 @@ function Cart() {
   };
   const delCart = async (cartId, cartProductTitle) => {
     try {
-      const res = await axios.delete(` ${API_BASE}/api/${API_PATH}/cart/${cartId}`);
+      const res = await axios.delete(`${API_BASE}/api/${API_PATH}/cart/${cartId}`);
       const res2 = await axios.get(`${API_BASE}/api/${API_PATH}/cart`);
       setCart(res2.data.data);
       toastSuccess(`已刪除「${cartProductTitle}」`);
@@ -90,11 +90,20 @@ function Cart() {
                 <div className="input-group input-group-sm mb-3">
                   <input
                     type="number"
+                    min={0}
                     className="form-control"
                     aria-label="Sizing example input"
                     aria-describedby="inputGroup-sizing-sm"
                     defaultValue={cartItem.qty}
-                    onChange={(e) => updateCart(cartItem.id, cartItem.product_id, Number(e.target.value))}
+                    onChange={(e) => {
+                      const qty = Number(e.target.value);
+
+                      if (qty <= 0) {
+                        delCart(cartItem.id, cartItem.product.title);
+                      } else {
+                        updateCart(cartItem.id, cartItem.product_id, qty);
+                      }
+                    }}
                   />
                   <span className="input-group-text" id="inputGroup-sizing-sm">
                     {cartItem.product.unit}
